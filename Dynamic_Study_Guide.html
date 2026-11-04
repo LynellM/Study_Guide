@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dynamic Study Guide - AI Usage Levels</title>
+  <style>
+    :root {
+      --bg: #f5f3fa;
+      --card: #ffffff;
+      --ink: #1f1b2d;
+      --muted: #5c5470;
+      --purple: #5b2c91;
+      --purple-dark: #472272;
+      --gold: #f2c94c;
+      --green: #157347;
+      --green-bg: #e8fff2;
+      --red: #b42318;
+      --red-bg: #fff0ee;
+      --blue: #0b5fff;
+      --border: #ddd6ea;
+      --shadow: 0 12px 28px rgba(35, 22, 62, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #f8f6fc 0%, #f2eef9 100%);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    .scoreboard {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(71, 34, 114, 0.96);
+      color: white;
+      border-bottom: 4px solid var(--gold);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .scoreboard-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      padding: 14px 20px;
+      align-items: center;
+    }
+
+    .metric {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 10px 12px;
+    }
+
+    .metric-label {
+      font-size: 0.8rem;
+      opacity: 0.85;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .metric-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--purple) 0%, #7a43bf 100%);
+      color: white;
+      padding: 28px;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 2rem;
+    }
+
+    .hero p {
+      margin: 8px 0;
+      max-width: 850px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .pill {
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+    }
+
+    .section-card, .question-card, .result-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .section-card {
+      padding: 22px;
+      margin-bottom: 20px;
+    }
+
+    .section-card h2 {
+      margin-top: 0;
+      color: var(--purple-dark);
+    }
+
+    .question-card {
+      padding: 22px;
+      margin: 18px 0;
+      scroll-margin-top: 120px;
+    }
+
+    .question-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .q-badge {
+      display: inline-block;
+      background: #f3ebff;
+      color: var(--purple-dark);
+      border: 1px solid #d9c8f5;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .points {
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .question-card h3 {
+      margin: 8px 0 14px;
+      font-size: 1.15rem;
+    }
+
+    .question-card p {
+      margin-top: 0;
+    }
+
+    .choice {
+      display: block;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin: 10px 0;
+      cursor: pointer;
+      transition: 0.2s ease;
+      background: #fcfbfe;
+    }
+
+    .choice:hover {
+      border-color: #b89ee0;
+      background: #f8f3ff;
+    }
+
+    .choice input {
+      margin-right: 10px;
+      transform: scale(1.1);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      font: inherit;
+      resize: vertical;
+      background: #fcfbfe;
+    }
+
+    textarea:focus, button:focus, input:focus {
+      outline: 3px solid rgba(11, 95, 255, 0.18);
+      outline-offset: 2px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--purple);
+      color: white;
+    }
+
+    .btn-primary:hover { background: var(--purple-dark); }
+
+    .btn-secondary {
+      background: #ece7f6;
+      color: var(--purple-dark);
+    }
+
+    .btn-secondary:hover { background: #dfd6f0; }
+
+    .feedback {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      display: none;
+    }
+
+    .feedback.correct {
+      background: var(--green-bg);
+      border-color: #a7e1bf;
+    }
+
+    .feedback.incorrect {
+      background: var(--red-bg);
+      border-color: #f2b8b3;
+    }
+
+    .feedback h4 {
+      margin: 0 0 8px;
+    }
+
+    .feedback ul {
+      margin: 10px 0 0 20px;
+      padding: 0;
+    }
+
+    .correct-answer {
+      font-weight: 700;
+      color: var(--purple-dark);
+    }
+
+    .disabled {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .result-card {
+      padding: 24px;
+      margin-top: 28px;
+    }
+
+    .final-grade {
+      font-size: 2rem;
+      color: var(--purple-dark);
+      margin: 10px 0;
+      font-weight: 800;
+    }
+
+    .small-note {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .footer-note {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 780px) {
+      .scoreboard-inner {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .hero h1 { font-size: 1.6rem; }
+    }
+
+    @media (max-width: 520px) {
+      .scoreboard-inner {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="scoreboard" aria-label="Live score panel">
+    <div class="scoreboard-inner">
+      <div class="metric">
+        <div class="metric-label">Score</div>
+        <div class="metric-value"><span id="scoreValue">0</span> / <span id="totalValue">22</span></div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Percent</div>
+        <div class="metric-value" id="percentValue">0%</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Answered</div>
+        <div class="metric-value"><span id="answeredValue">0</span> / <span id="questionCountValue">10</span></div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Current Grade</div>
+        <div class="metric-value" id="letterValue">Not graded yet</div>
+      </div>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>Dynamic Study Guide: AI Usage Levels</h1>
+      <p>This self-scoring study guide is based on the uploaded class slide deck covering AI usage levels from L0 through L6, phase transitions, governance, and frontier concepts.</p>
+      <p>Every question gives immediate feedback, shows the correct answer, explains why it is correct, and explains why wrong answers are wrong. Your score stays visible at the top while you scroll.</p>
+      <div class="pill-row">
+        <span class="pill">6 multiple choice questions</span>
+        <span class="pill">4 short answer questions</span>
+        <span class="pill">Auto-scored</span>
+        <span class="pill">Sticky live scoreboard</span>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>How to Use</h2>
+      <p>Answer each question, then click <strong>Check Answer</strong>. You will get feedback right away. Multiple choice questions are scored automatically. Short answer questions use keyword matching, so include the core concepts from the slides in your own words.</p>
+      <p class="small-note">This file is fully self-contained. Save it as <strong>study-guide.html</strong> and open it in a browser.</p>
+    </section>
+
+    <div id="quiz"></div>
+
+    <section class="result-card" id="finalResults">
+      <h2>Overall Results</h2>
+      <div class="final-grade" id="finalGrade">0%</div>
+      <p id="summaryText">Complete the questions to see your final summary.</p>
+      <div class="btn-row">
+        <button class="btn-secondary" id="resetQuiz">Reset Quiz</button>
+      </div>
+      <p class="footer-note">Tip: To turn this into a linked test site, save this file and link to it from any home page, LMS page, or shared drive.</p>
+    </section>
+  </main>
+
+  <script>
+    const questions = [
+      {
+        id: 1,
+        type: 'mcq',
+        points: 2,
+        prompt: 'Which statement best describes Level 0 (L0) Naive Prompting?',
+        choices: [
+          {
+            key: 'A',
+            text: 'The user uploads documents and grounds responses in source material.',
+            correct: false,
+            explanation: 'That describes L2 context injection, where the model is grounded in user-provided data.'
+          },
+          {
+            key: 'B',
+            text: 'The user asks unstructured, single-shot questions and accepts output at face value.',
+            correct: true,
+            explanation: 'Correct. L0 is characterized by vague, search-engine-like prompting with no role, context, or verification.'
+          },
+          {
+            key: 'C',
+            text: 'The user orchestrates multiple specialized agents working in parallel.',
+            correct: false,
+            explanation: 'That is L6 multi-agent orchestration, not L0.'
+          },
+          {
+            key: 'D',
+            text: 'The user adds deterministic hooks before and after AI actions.',
+            correct: false,
+            explanation: 'That belongs to L5, where hooks and programmatic controls are added.'
+          }
+        ],
+        correctExplanation: 'L0 is the novice stage: simple prompts, little structure, and no formal verification of the response.'
+      },
+      {
+        id: 2,
+        type: 'mcq',
+        points: 2,
+        prompt: 'Which prompt feature is most associated with Level 1 (L1) Structured Prompting?',
+        choices: [
+          {
+            key: 'A',
+            text: 'Uploading a PDF and asking the AI to compare sections from it',
+            correct: false,
+            explanation: 'That is L2 because the model is being grounded in external source material.'
+          },
+          {
+            key: 'B',
+            text: 'Giving the AI a role, output format, and constraints such as word count and tone',
+            correct: true,
+            explanation: 'Correct. L1 focuses on designing the interaction through roles, formatting, and explicit constraints.'
+          },
+          {
+            key: 'C',
+            text: 'Letting agents self-organize around a problem without a central coordinator',
+            correct: false,
+            explanation: 'That is part of the frontier beyond L6, not L1.'
+          },
+          {
+            key: 'D',
+            text: 'Connecting AI to Slack, Gmail, and databases',
+            correct: false,
+            explanation: 'That fits L3 tool use and connectors.'
+          }
+        ],
+        correctExplanation: 'L1 improves quality and consistency by shaping the prompt with roles, formatting requirements, and constraints.'
+      },
+      {
+        id: 3,
+        type: 'mcq',
+        points: 2,
+        prompt: 'What is the key shift in the Passive → Active phase transition?',
+        choices: [
+          {
+            key: 'A',
+            text: 'The AI begins using the user’s documents and data instead of relying only on pre-training knowledge.',
+            correct: true,
+            explanation: 'Correct. The deck says the AI stops relying solely on its training and starts using your data.'
+          },
+          {
+            key: 'B',
+            text: 'The AI starts spawning specialized sub-agents in parallel.',
+            correct: false,
+            explanation: 'That describes the Single → Multi-Agent transition at L6.'
+          },
+          {
+            key: 'C',
+            text: 'The AI becomes formally verified and provably correct.',
+            correct: false,
+            explanation: 'Formal verification is discussed as a frontier axis beyond L6, not the Passive → Active transition.'
+          },
+          {
+            key: 'D',
+            text: 'The AI automatically memorizes user preferences across sessions.',
+            correct: false,
+            explanation: 'Persistent memory belongs to L4.'
+          }
+        ],
+        correctExplanation: 'The major change is grounding: responses can be checked against actual source material, making them more verifiable.'
+      },
+      {
+        id: 4,
+        type: 'mcq',
+        points: 2,
+        prompt: 'A user connects AI to Slack to read messages and then post a summary to a dashboard. What level is this?',
+        choices: [
+          {
+            key: 'A',
+            text: 'L1 Structured Prompting',
+            correct: false,
+            explanation: 'L1 is prompt design, not external read/write action.'
+          },
+          {
+            key: 'B',
+            text: 'L2 Context Injection',
+            correct: false,
+            explanation: 'L2 is about grounding with data, but this scenario explicitly reads from and writes to external tools.'
+          },
+          {
+            key: 'C',
+            text: 'L3 Tool Use + Connectors',
+            correct: true,
+            explanation: 'Correct. L3 allows AI to retrieve information from tools and act on external systems.'
+          },
+          {
+            key: 'D',
+            text: 'L5 Hooks + Deterministic Control',
+            correct: false,
+            explanation: 'L5 adds control logic around actions, but the core scenario here is the use of tools and connectors.'
+          }
+        ],
+        correctExplanation: 'L3 is defined by bidirectional interaction with outside systems such as Slack, Gmail, databases, tickets, and dashboards.'
+      },
+      {
+        id: 5,
+        type: 'mcq',
+        points: 2,
+        prompt: 'Which governance control is most appropriate for Level 3 (L3) according to the slides?',
+        choices: [
+          {
+            key: 'A',
+            text: 'Prompt design and review only',
+            correct: false,
+            explanation: 'That is more aligned with L0–L1 output quality concerns.'
+          },
+          {
+            key: 'B',
+            text: 'Permission boundaries, least privilege, approval gates, and audit logs',
+            correct: true,
+            explanation: 'Correct. Once AI can act through tools, action safety and accountability become critical.'
+          },
+          {
+            key: 'C',
+            text: 'No controls are needed if the tools are useful',
+            correct: false,
+            explanation: 'The slides explicitly emphasize governance, especially least privilege and auditing.'
+          },
+          {
+            key: 'D',
+            text: 'Only memory hygiene and skill auditing',
+            correct: false,
+            explanation: 'That aligns more with L4 concerns, not L3.'
+          }
+        ],
+        correctExplanation: 'Because L3 can modify external state, governance must address permissions, risky actions, and traceability.'
+      },
+      {
+        id: 6,
+        type: 'mcq',
+        points: 2,
+        prompt: 'Why does the deck say levels are additive, not replacements?',
+        choices: [
+          {
+            key: 'A',
+            text: 'Because every new level removes the need for the levels below it',
+            correct: false,
+            explanation: 'That is the opposite of the slide’s point.'
+          },
+          {
+            key: 'B',
+            text: 'Because higher-level practice still depends on lower-level skills like structured prompting, context, and permissions',
+            correct: true,
+            explanation: 'Correct. The slide explicitly says a Level 6 practitioner still uses L1, L2, and L3 skills.'
+          },
+          {
+            key: 'C',
+            text: 'Because the levels are random categories with no relationship to each other',
+            correct: false,
+            explanation: 'The framework is cumulative, not random.'
+          },
+          {
+            key: 'D',
+            text: 'Because only L0 and L1 matter in real work',
+            correct: false,
+            explanation: 'The presentation argues that moving to L2+ is a major improvement in professional use.'
+          }
+        ],
+        correctExplanation: 'Higher levels compound lower-level skills. Advanced systems still need strong prompt design, context handling, and governance.'
+      },
+      {
+        id: 7,
+        type: 'short',
+        points: 3,
+        prompt: 'In 2–4 sentences, explain the difference between zero-shot, one-shot, and few-shot prompting.',
+        sampleAnswer: 'Zero-shot uses no examples and depends on what the model already knows. One-shot gives one example to establish a pattern, format, tone, or convention. Few-shot gives several examples, usually 2–5, to teach nuance, edge cases, or domain-specific logic.',
+        requiredKeywords: ['zero-shot', 'no examples', 'one-shot', 'one example', 'few-shot', '2', '5', 'examples'],
+        rubric: [
+          'Mentions zero-shot means no examples',
+          'Mentions one-shot means one example',
+          'Mentions few-shot uses multiple examples to teach nuance or edge cases'
+        ],
+        correctExplanation: 'The key distinction is how many examples are given before the task. More examples usually give more control, but they also consume context space.'
+      },
+      {
+        id: 8,
+        type: 'short',
+        points: 3,
+        prompt: 'Describe what Level 4 adds to an AI system and give one example from the slides.',
+        sampleAnswer: 'Level 4 adds persistent memory and reusable skills across sessions, so the system can remember preferences, project context, and feedback over time. An example from the slides is a named skill such as /commit or /review-pr.',
+        requiredKeywords: ['memory', 'persistent', 'skills', 'sessions', 'preferences', 'project', '/commit', '/review-pr', '/xlsx'],
+        rubric: [
+          'Explains that memory persists across sessions',
+          'Explains that reusable skills can be invoked by name',
+          'Gives a valid example such as /commit, /review-pr, or /xlsx'
+        ],
+        correctExplanation: 'L4 changes the system from stateless to stateful. It remembers useful context and can trigger repeatable workflows as reusable skills.'
+      },
+      {
+        id: 9,
+        type: 'short',
+        points: 3,
+        prompt: 'Why are hooks important at Level 5? Include both governance and control in your answer.',
+        sampleAnswer: 'Hooks are important because they add deterministic control around probabilistic AI behavior. They can validate or block actions before execution, log or trigger workflows after execution, and help with compliance through approval gates and audit trails.',
+        requiredKeywords: ['hooks', 'deterministic', 'control', 'validate', 'block', 'log', 'audit', 'compliance', 'approval'],
+        rubric: [
+          'Mentions deterministic control over AI behavior',
+          'Mentions pre-tool or post-tool actions such as validate, block, or log',
+          'Mentions governance outcomes such as compliance, approval, or audit trail'
+        ],
+        correctExplanation: 'L5 matters because it bridges uncertain model output with reliable rules, approvals, and evidence for oversight.'
+      },
+      {
+        id: 10,
+        type: 'short',
+        points: 3,
+        prompt: 'The slide deck says the “Verified” frontier axis is especially important for audit, GRC, and metrology. Why?',
+        sampleAnswer: 'It is important because it aims to move AI from “probably right” to provably correct outputs. In audit, GRC, and metrology, organizations need evidence, formal validation, and stronger guarantees rather than only plausible responses.',
+        requiredKeywords: ['verified', 'provably', 'correct', 'audit', 'grc', 'probably right', 'guarantees', 'formal'],
+        rubric: [
+          'Mentions provably correct or formal verification',
+          'Connects the idea to audit, GRC, or metrology',
+          'Contrasts provable guarantees with merely probable answers'
+        ],
+        correctExplanation: 'The slides frame verification as the bridge from probabilistic AI output to provable guarantees, which is highly relevant in control-heavy domains.'
+      }
+    ];
+
+    const state = {};
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function normalize(text) {
+      return text.toLowerCase().replace(/[^a-z0-9\/+\-\s]/g, ' ');
+    }
+
+    function buildQuiz() {
+      const quiz = document.getElementById('quiz');
+      document.getElementById('totalValue').textContent = questions.reduce((sum, q) => sum + q.points, 0);
+      document.getElementById('questionCountValue').textContent = questions.length;
+
+      quiz.innerHTML = questions.map((q) => {
+        if (q.type === 'mcq') {
+          return `
+            <section class="question-card" id="question-${q.id}">
+              <div class="question-top">
+                <span class="q-badge">Question ${q.id} · Multiple Choice</span>
+                <span class="points">${q.points} points</span>
+              </div>
+              <h3>${escapeHtml(q.prompt)}</h3>
+              <form id="form-${q.id}">
+                ${q.choices.map(choice => `
+                  <label class="choice">
+                    <input type="radio" name="question-${q.id}" value="${choice.key}" />
+                    <strong>${choice.key}.</strong> ${escapeHtml(choice.text)}
+                  </label>
+                `).join('')}
+              </form>
+              <div class="btn-row">
+                <button class="btn-primary" type="button" onclick="gradeMCQ(${q.id})">Check Answer</button>
+              </div>
+              <div class="feedback" id="feedback-${q.id}"></div>
+            </section>
+          `;
+        }
+
+        return `
+          <section class="question-card" id="question-${q.id}">
+            <div class="question-top">
+              <span class="q-badge">Question ${q.id} · Short Answer</span>
+              <span class="points">${q.points} points</span>
+            </div>
+            <h3>${escapeHtml(q.prompt)}</h3>
+            <textarea id="short-${q.id}" placeholder="Type your answer here..."></textarea>
+            <div class="btn-row">
+              <button class="btn-primary" type="button" onclick="gradeShort(${q.id})">Check Answer</button>
+            </div>
+            <div class="feedback" id="feedback-${q.id}"></div>
+          </section>
+        `;
+      }).join('');
+    }
+
+    function gradeMCQ(id) {
+      const question = questions.find(q => q.id === id);
+      const selected = document.querySelector(`input[name="question-${id}"]:checked`);
+      const feedback = document.getElementById(`feedback-${id}`);
+
+      if (!selected) {
+        feedback.style.display = 'block';
+        feedback.className = 'feedback incorrect';
+        feedback.innerHTML = '<h4>Choose an answer first.</h4><p>Select one option before checking your answer.</p>';
+        return;
+      }
+
+      const chosen = question.choices.find(c => c.key === selected.value);
+      const correctChoice = question.choices.find(c => c.correct);
+      const earned = chosen.correct ? question.points : 0;
+
+      state[id] = { answered: true, earned, max: question.points };
+
+      document.getElementById(`form-${id}`).classList.add('disabled');
+
+      feedback.style.display = 'block';
+      feedback.className = `feedback ${chosen.correct ? 'correct' : 'incorrect'}`;
+
+      let wrongChoiceNotes = '';
+      if (!chosen.correct) {
+        wrongChoiceNotes = `<p><strong>Why your choice was wrong:</strong> ${escapeHtml(chosen.explanation)}</p>`;
+      }
+
+      feedback.innerHTML = `
+        <h4>${chosen.correct ? 'Correct' : 'Incorrect'}</h4>
+        <p><span class="correct-answer">Right answer: ${correctChoice.key}. ${escapeHtml(correctChoice.text)}</span></p>
+        <p><strong>Why that is correct:</strong> ${escapeHtml(question.correctExplanation)}</p>
+        ${wrongChoiceNotes}
+      `;
+
+      const btn = feedback.previousElementSibling.querySelector('button');
+      btn.disabled = true;
+      btn.textContent = 'Answer Checked';
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-secondary');
+
+      updateScoreboard();
+    }
+
+    function gradeShort(id) {
+      const question = questions.find(q => q.id === id);
+      const textarea = document.getElementById(`short-${id}`);
+      const feedback = document.getElementById(`feedback-${id}`);
+      const answer = textarea.value.trim();
+
+      if (!answer) {
+        feedback.style.display = 'block';
+        feedback.className = 'feedback incorrect';
+        feedback.innerHTML = '<h4>Write an answer first.</h4><p>Add a short response before checking your answer.</p>';
+        return;
+      }
+
+      const norm = normalize(answer);
+      let matched = 0;
+
+      const keywordGroups = [
+        ['zero-shot', 'no examples'],
+        ['one-shot', 'one example'],
+        ['few-shot', '2', '5', 'examples'],
+        ['memory', 'persistent', 'skills', 'sessions'],
+        ['preferences', 'project', '/commit', '/review-pr', '/xlsx'],
+        ['hooks', 'deterministic', 'control'],
+        ['validate', 'block', 'log', 'audit', 'compliance', 'approval'],
+        ['verified', 'provably', 'correct', 'audit', 'grc', 'formal', 'guarantees', 'probably right']
+      ];
+
+      // Question-specific scoring: count matched required keywords.
+      const required = question.requiredKeywords;
+      matched = required.reduce((count, keyword) => count + (norm.includes(normalize(keyword)) ? 1 : 0), 0);
+
+      const ratio = matched / required.length;
+      let earned = 0;
+      if (ratio >= 0.65) earned = question.points;
+      else if (ratio >= 0.35) earned = Math.max(1, question.points - 1);
+      else earned = 0;
+
+      state[id] = { answered: true, earned, max: question.points };
+      textarea.disabled = true;
+
+      const isStrong = earned === question.points;
+      feedback.style.display = 'block';
+      feedback.className = `feedback ${isStrong ? 'correct' : 'incorrect'}`;
+
+      const missing = required.filter(keyword => !norm.includes(normalize(keyword)));
+      const missingText = missing.length
+        ? `<p><strong>What was missing or too limited:</strong> Consider including ideas like ${escapeHtml(missing.slice(0, 5).join(', '))}.</p>`
+        : '';
+
+      feedback.innerHTML = `
+        <h4>${isStrong ? 'Strong answer' : 'Partially correct / needs more detail'}</h4>
+        <p><strong>Score for this question:</strong> ${earned} / ${question.points}</p>
+        <p><span class="correct-answer">Sample right answer:</span> ${escapeHtml(question.sampleAnswer)}</p>
+        <p><strong>Why that is correct:</strong> ${escapeHtml(question.correctExplanation)}</p>
+        ${missingText}
+      `;
+
+      const btn = feedback.previousElementSibling.querySelector('button');
+      btn.disabled = true;
+      btn.textContent = 'Answer Checked';
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-secondary');
+
+      updateScoreboard();
+    }
+
+    function updateScoreboard() {
+      const total = questions.reduce((sum, q) => sum + q.points, 0);
+      const answered = Object.keys(state).length;
+      const score = Object.values(state).reduce((sum, item) => sum + item.earned, 0);
+      const percent = total === 0 ? 0 : Math.round((score / total) * 100);
+
+      let letter = 'Not graded yet';
+      if (answered > 0) {
+        if (percent >= 90) letter = 'A';
+        else if (percent >= 80) letter = 'B';
+        else if (percent >= 70) letter = 'C';
+        else if (percent >= 60) letter = 'D';
+        else letter = 'Needs review';
+      }
+
+      document.getElementById('scoreValue').textContent = score;
+      document.getElementById('percentValue').textContent = `${percent}%`;
+      document.getElementById('answeredValue').textContent = answered;
+      document.getElementById('letterValue').textContent = letter;
+      document.getElementById('finalGrade').textContent = `${percent}% (${letter})`;
+
+      const remaining = questions.length - answered;
+      let summary = `You have answered ${answered} of ${questions.length} questions and earned ${score} out of ${total} points.`;
+
+      if (answered === questions.length) {
+        if (percent >= 90) summary += ' Excellent work. You show strong command of the taxonomy, governance, and frontier concepts.';
+        else if (percent >= 80) summary += ' Good work. You understand the major ideas well, but review the missed concepts for stronger recall.';
+        else if (percent >= 70) summary += ' Fair result. Review phase transitions, governance by level, and the distinction between L4, L5, and L6.';
+        else summary += ' You should review the slide deck again, especially level definitions, phase transitions, and governance controls.';
+      } else {
+        summary += ` ${remaining} question(s) remain.`;
+      }
+
+      document.getElementById('summaryText').textContent = summary;
+    }
+
+    function resetQuiz() {
+      Object.keys(state).forEach(key => delete state[key]);
+      buildQuiz();
+      updateScoreboard();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.getElementById('resetQuiz').addEventListener('click', resetQuiz);
+
+    buildQuiz();
+    updateScoreboard();
+  </script>
+</body>
+</html>

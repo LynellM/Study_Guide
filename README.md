@@ -1,6 +1,6 @@
-# Interactive Study Guide: *Live Not By Lies*
+# Dynamic Study Guide: AI Usage Levels
 
-A single-page study guide for Alexander Solzhenitsyn's essay *Live Not By Lies*, written for an Internal Auditing course (ACCT 3233). It has a summary, key ideas, a scored practice quiz, short-answer practice with model answers, audit scenarios, and a timed exam mode.
+A self-scoring study guide for a class slide deck on AI usage levels: L0 through L6, phase transitions, governance by level, and frontier concepts. It has 6 multiple-choice and 4 short-answer questions (24 points), a sticky live scoreboard, and a timed exam mode.
 
 It's plain HTML, CSS, and JavaScript in one file, with no frameworks, build step, or install.
 
@@ -8,41 +8,42 @@ It's plain HTML, CSS, and JavaScript in one file, with no frameworks, build step
 
 Open `index.html` in Chrome or Safari.
 
-- **Practice Quiz:** Click an answer for each question. You get instant feedback and a running score.
-- **Exam Mode:** The bar at the top stays visible while you scroll.
-  - **Start** begins a fresh 5-minute attempt at the quiz.
-  - **Pause / Resume** stops the clock. The quiz stays locked while paused, so you can't answer with the clock stopped.
+- **Answering:** Pick or type an answer, then click **Check Answer**. Multiple-choice questions are scored automatically. Short-answer questions use keyword matching, so include the core concepts from the slides. Each answer gets immediate feedback with the correct answer and why it's right.
+- **Scoreboard:** The score, percent, answered count, and letter grade stay pinned to the top of the screen.
+- **Exam Mode** (in the scoreboard):
+  - **Start** begins a fresh 5-minute attempt.
+  - **Pause / Resume** stops the clock. The quiz is locked while paused, so you can't answer with the clock stopped.
   - **Reset** puts the timer back to 5:00 and clears the quiz.
-  - When time runs out, the quiz locks, unanswered questions are marked, and your final score appears in the bar. If you answer every question first, the exam ends early and shows how much time you had left.
-- **Show Correct Answers** reveals the answers to any questions you haven't answered. Revealed questions are locked, but they don't count as answered and don't add to your score. It's disabled during a timed exam.
+  - When time runs out, the quiz locks, questions you hadn't checked are marked "Not answered", and your final score appears in the scoreboard. Only checked answers count. If you check every answer first, the exam ends early and shows how much time was left.
+- **Show Correct Answers** (under Overall Results) reveals the answers to any questions you haven't checked. Revealed questions are locked, but they don't count as answered and earn no points. It's disabled during a timed exam.
 
 ## What changed from the original
 
-The original `Study_guide.html` is kept in this folder for comparison. `index.html` keeps the same content and look, with these fixes:
+The original `Dynamic_Study_Guide.html` is kept in this folder for comparison. `index.html` keeps the same questions, scoring, and look, and adds:
 
-| Original behavior | Now |
+| Original | Now |
 | --- | --- |
-| The timer showed 05:00 for a full second before counting down | The countdown starts immediately |
-| Stop paused the clock without resetting it, and Start always restarted it | Separate Start, Pause/Resume, and Reset controls |
-| The timer sat in a card partway down the page | It's in a sticky bar that stays visible while you scroll |
-| Nothing happened to the quiz when time ran out | The quiz locks and shows your final score |
-| Show Correct Answers counted revealed questions as "answered" | Revealed questions no longer count as answered |
-| The timer drifted if the tab was in the background | The countdown runs against a fixed end time, so it stays accurate |
+| No timer | A 5-minute exam mode with Start, Pause/Resume, and Reset, built into the sticky scoreboard |
+| Nothing ended the quiz | When time runs out, the quiz locks and shows the final score |
+| No way to see answers without answering | **Show Correct Answers** reveals answers without counting them as answered or scored |
+| On phones, the scoreboard stacked into one tall column | It stays two boxes across on small screens, so it covers less of the page |
+
+The timer counts down to a fixed end time instead of counting ticks, so it stays accurate even if the browser slows a background tab.
 
 ## How I built it with Claude Code
 
-I made the update with [Claude Code](https://claude.com/claude-code), running in the VS Code terminal. I described the changes I wanted in one prompt: rebuild the page as `index.html`, turn the timer into a real exam mode, fix the answer-reveal bug, test it, write this README, and walk me through publishing to GitHub.
+I made the update with [Claude Code](https://claude.com/claude-code), running in the VS Code terminal. I gave it one prompt: rebuild the page as `index.html`, add a real 5-minute exam mode, handle revealed answers correctly, test it, write this README, and walk me through publishing to GitHub.
 
 Here's how the work went:
 
-1. **Finding and reading the code.** Claude Code found my original file and read through it. It pointed out the existing timer problems before changing anything.
-2. **Making the changes.** It edited the page in small steps. The exam is modeled as four states (`idle`, `running`, `paused`, `finished`), and each control moves the exam between them.
-3. **Testing.** Claude Code wrote a 26-check test script and ran it in headless Chrome on a temporary copy of the page. The script fakes the clock, so the full 5-minute timeout runs in seconds. It checks counting down, pausing, locking at time-out, the final score, Reset, finishing early, and the reveal fix. It also took screenshots to check the layout.
-4. **Docs and Git.** Claude Code drafted this README. Then it walked me through creating the GitHub repository, explaining each Git command before running it and asking before pushing.
+1. **Reading the code first.** Claude Code read the whole original file before changing anything. It noticed the page had no timer yet, so it built one instead of trying to fix one.
+2. **Making the changes.** It put the exam controls in the existing sticky scoreboard, so the time stays visible while scrolling. The exam is modeled as four states (`idle`, `running`, `paused`, `finished`), and each control moves the exam between them.
+3. **Testing.** Claude Code wrote a 28-check test script and ran it in headless Chrome on a temporary copy of the page. The script fakes the clock, so the full 5-minute timeout runs in seconds. It checks counting down, pausing and locking, the time-out score, Reset, finishing early, and that revealed answers aren't counted. When one check failed, the problem was the test's own math: the HTML starts the total at 22 points, but the questions add up to 24. Claude Code fixed the test, then took screenshots at desktop and phone widths, which is how it caught the scoreboard taking up half the phone screen.
+4. **Git.** Claude Code explained each Git command before running it and asked before pushing to GitHub.
 
 I reviewed each step as it happened, and I'm responsible for the final result.
 
 ## Files
 
 - `index.html`: the updated study guide
-- `Study_guide.html`: the original version, kept for comparison
+- `Dynamic_Study_Guide.html`: the original version, kept for comparison
