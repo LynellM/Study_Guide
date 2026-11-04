@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Study Guide - Live Not By Lies</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --card-2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #38bdf8;
+      --good: #22c55e;
+      --bad: #ef4444;
+      --warn: #f59e0b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #0b1020, #111827);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero, .card {
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .hero {
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+
+    h1, h2, h3 { margin-top: 0; }
+
+    .subtitle {
+      color: var(--muted);
+      margin-top: -6px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--accent);
+      font-size: 0.9rem;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+
+    button {
+      background: var(--accent);
+      color: #062033;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 6px 6px 0 0;
+    }
+
+    button.secondary {
+      background: #334155;
+      color: var(--text);
+    }
+
+    button:hover { opacity: 0.92; }
+
+    .question {
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      background: rgba(31, 41, 55, 0.7);
+      margin-bottom: 14px;
+    }
+
+    .option {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: #1e293b;
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.08);
+      margin-top: 8px;
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    .option.correct {
+      background: rgba(34, 197, 94, 0.18);
+      border-color: var(--good);
+    }
+
+    .option.incorrect {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: var(--bad);
+    }
+
+    .feedback {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .good { color: var(--good); }
+    .bad { color: var(--bad); }
+    .warn { color: var(--warn); }
+    .muted { color: var(--muted); }
+
+    .hidden { display: none; }
+
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: #0f172a;
+      color: var(--text);
+      padding: 12px;
+      font-size: 1rem;
+    }
+
+    .scoreboard {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .scorebox {
+      flex: 1 1 150px;
+      background: rgba(255,255,255,0.04);
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .big {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .timer {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--warn);
+    }
+
+    details {
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-top: 10px;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .footer-note {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <h1>Interactive Study Guide: <em>Live Not By Lies</em></h1>
+      <p class="subtitle">Use this to review themes, test yourself, and practice short-answer responses for your exam.</p>
+      <div>
+        <span class="pill">Ethics</span>
+        <span class="pill">Truth vs Falsehood</span>
+        <span class="pill">Personal Responsibility</span>
+        <span class="pill">Internal Auditing Connection</span>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>Quick Summary</h2>
+        <p>The essay argues that oppressive systems survive not only through force, but through ordinary people participating in lies. The author's solution is personal refusal to support, repeat, sign, or normalize falsehood.</p>
+      </div>
+      <div class="card">
+        <h2>Why It Matters for Audit</h2>
+        <p>It connects directly to internal auditing because auditors depend on truthful reporting, ethical conduct, documentation integrity, and the courage to challenge misleading information.</p>
+      </div>
+      <div class="card">
+        <h2>Author Snapshot</h2>
+        <p>Alexander Solzhenitsyn was a Russian writer known for exposing oppression, censorship, and moral compromise under the Soviet regime. His work emphasizes truth, conscience, and accountability.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Key Ideas to Memorize</h2>
+      <ul>
+        <li>Lies help sustain corrupt systems.</li>
+        <li>Individuals share responsibility when they repeat or accept falsehoods.</li>
+        <li>The most accessible form of resistance is non-participation in lies.</li>
+        <li>Fear, comfort, and self-preservation often drive unethical behavior.</li>
+        <li>Truth-telling is a form of moral courage.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>Practice Quiz</h2>
+      <p class="muted">Click one answer for each question. Your score updates automatically.</p>
+      <div id="quiz"></div>
+      <div class="scoreboard">
+        <div class="scorebox">
+          <div class="muted">Score</div>
+          <div class="big"><span id="score">0</span> / <span id="total">0</span></div>
+        </div>
+        <div class="scorebox">
+          <div class="muted">Answered</div>
+          <div class="big" id="answered">0</div>
+        </div>
+        <div class="scorebox">
+          <div class="muted">Result</div>
+          <div class="big" id="resultText">Start the quiz</div>
+        </div>
+      </div>
+      <button onclick="resetQuiz()">Reset Quiz</button>
+      <button class="secondary" onclick="showAllAnswers()">Show Correct Answers</button>
+    </section>
+
+    <section class="card">
+      <h2>Short-Answer Practice</h2>
+      <p>Write your response first, then reveal a model answer.</p>
+
+      <div class="question">
+        <h3>1. What does “live not by lies” mean?</h3>
+        <textarea placeholder="Type your answer here..."></textarea>
+        <details>
+          <summary>Show model answer</summary>
+          <p>It means refusing to support, repeat, sign, or normalize falsehood, even when doing so is uncomfortable or costly.</p>
+        </details>
+      </div>
+
+      <div class="question">
+        <h3>2. How does this essay connect to internal auditing?</h3>
+        <textarea placeholder="Type your answer here..."></textarea>
+        <details>
+          <summary>Show model answer</summary>
+          <p>Internal auditing depends on truthful information, reliable controls, and ethical behavior. The essay supports the idea that people must not participate in misleading reports, fraud, concealment, or compliance failures.</p>
+        </details>
+      </div>
+
+      <div class="question">
+        <h3>3. Why is fear important in the essay?</h3>
+        <textarea placeholder="Type your answer here..."></textarea>
+        <details>
+          <summary>Show model answer</summary>
+          <p>Fear causes people to accept lies for safety, comfort, or job security. The author argues that this fear helps false systems survive.</p>
+        </details>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Exam Mode</h2>
+      <p>Try a timed review round.</p>
+      <div class="timer">Time left: <span id="timer">05:00</span></div>
+      <button onclick="startTimer(300)">Start 5-Minute Timer</button>
+      <button class="secondary" onclick="stopTimer()">Stop Timer</button>
+      <p id="timerMessage" class="muted">Timer not started.</p>
+    </section>
+
+    <section class="card">
+      <h2>Internal Auditing Application Scenarios</h2>
+      <div class="question">
+        <h3>Scenario 1</h3>
+        <p>Your manager asks you to approve numbers you know are slightly inflated so the department looks better in a review.</p>
+        <details>
+          <summary>Best response</summary>
+          <p>Do not approve inaccurate information. Document the issue, seek clarification, and escalate appropriately if necessary. This aligns with refusing to participate in falsehood.</p>
+        </details>
+      </div>
+
+      <div class="question">
+        <h3>Scenario 2</h3>
+        <p>An organization hides control weaknesses in a report because leadership wants to avoid scrutiny.</p>
+        <details>
+          <summary>Best response</summary>
+          <p>This is an ethical and control failure. Auditors should report the weakness accurately because concealment increases risk and undermines governance.</p>
+        </details>
+      </div>
+    </section>
+
+    <p class="footer-note">Tip: Save this file as <strong>study-guide.html</strong> and open it in Chrome or Safari.</p>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        q: "What is the essay's main argument?",
+        options: [
+          "Violence is the best method for reform",
+          "Individuals must stop participating in lies",
+          "Silence is always the wisest choice",
+          "Government power cannot be challenged"
+        ],
+        answer: 1,
+        explanation: "The core message is that people should refuse to support falsehood, even in small everyday ways."
+      },
+      {
+        q: "According to the essay, oppressive systems are sustained mainly by:",
+        options: [
+          "Public participation in lies",
+          "A lack of education only",
+          "Natural disasters",
+          "Foreign trade"
+        ],
+        answer: 0,
+        explanation: "The author argues that lies need ordinary people to keep repeating and obeying them."
+      },
+      {
+        q: "Which idea best fits the author's solution?",
+        options: [
+          "Join every protest possible",
+          "Use violence to defeat violence",
+          "Refuse to say what you know is false",
+          "Ignore politics completely"
+        ],
+        answer: 2,
+        explanation: "He emphasizes personal non-participation in lies rather than violent resistance."
+      },
+      {
+        q: "What makes people comply with lies in the essay?",
+        options: [
+          "Curiosity",
+          "Fear and desire for comfort",
+          "Too much freedom",
+          "Lack of writing ability"
+        ],
+        answer: 1,
+        explanation: "The essay repeatedly points to fear, comfort, and self-preservation."
+      },
+      {
+        q: "Which action best matches the essay and internal auditing ethics?",
+        options: [
+          "Sign a report you know is misleading",
+          "Stay quiet to protect appearances",
+          "Report truthfully and avoid false statements",
+          "Delete evidence of a control problem"
+        ],
+        answer: 2,
+        explanation: "Truthful reporting and refusal to support falsehood are central to both the essay and audit ethics."
+      },
+      {
+        q: "Why is this essay relevant to internal auditing?",
+        options: [
+          "It argues that controls do not matter",
+          "It supports integrity, accountability, and truthful reporting",
+          "It is only about literature and has no business relevance",
+          "It says obedience is always ethical"
+        ],
+        answer: 1,
+        explanation: "Auditing depends on accurate information, integrity, and ethical courage."
+      }
+    ];
+
+    let score = 0;
+    let answeredCount = 0;
+    let answeredQuestions = new Set();
+    let timerInterval = null;
+
+    const quizEl = document.getElementById('quiz');
+    const scoreEl = document.getElementById('score');
+    const totalEl = document.getElementById('total');
+    const answeredEl = document.getElementById('answered');
+    const resultTextEl = document.getElementById('resultText');
+
+    totalEl.textContent = questions.length;
+
+    function renderQuiz() {
+      quizEl.innerHTML = '';
+      questions.forEach((item, index) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'question';
+        wrapper.innerHTML = `
+          <h3>Question ${index + 1}</h3>
+          <p>${item.q}</p>
+          <div id="options-${index}"></div>
+          <div class="feedback" id="feedback-${index}"></div>
+        `;
+
+        const optionsDiv = wrapper.querySelector(`#options-${index}`);
+        item.options.forEach((opt, optIndex) => {
+          const btn = document.createElement('button');
+          btn.className = 'option';
+          btn.textContent = opt;
+          btn.onclick = () => handleAnswer(index, optIndex);
+          btn.id = `q${index}-o${optIndex}`;
+          optionsDiv.appendChild(btn);
+        });
+
+        quizEl.appendChild(wrapper);
+      });
+    }
+
+    function handleAnswer(qIndex, selected) {
+      if (answeredQuestions.has(qIndex)) return;
+
+      const q = questions[qIndex];
+      const feedback = document.getElementById(`feedback-${qIndex}`);
+      answeredQuestions.add(qIndex);
+      answeredCount++;
+
+      q.options.forEach((_, optIndex) => {
+        const btn = document.getElementById(`q${qIndex}-o${optIndex}`);
+        btn.disabled = true;
+        if (optIndex === q.answer) btn.classList.add('correct');
+        if (optIndex === selected && selected !== q.answer) btn.classList.add('incorrect');
+      });
+
+      if (selected === q.answer) {
+        score++;
+        feedback.innerHTML = `<span class="good">Correct.</span> ${q.explanation}`;
+      } else {
+        feedback.innerHTML = `<span class="bad">Incorrect.</span> ${q.explanation}`;
+      }
+
+      updateScore();
+    }
+
+    function updateScore() {
+      scoreEl.textContent = score;
+      answeredEl.textContent = answeredCount;
+
+      if (answeredCount === 0) {
+        resultTextEl.textContent = 'Start the quiz';
+        return;
+      }
+
+      const percent = Math.round((score / questions.length) * 100);
+      if (answeredCount < questions.length) {
+        resultTextEl.textContent = `${percent}% so far`;
+      } else if (percent >= 85) {
+        resultTextEl.textContent = 'Excellent';
+      } else if (percent >= 70) {
+        resultTextEl.textContent = 'Good';
+      } else {
+        resultTextEl.textContent = 'Review again';
+      }
+    }
+
+    function resetQuiz() {
+      score = 0;
+      answeredCount = 0;
+      answeredQuestions = new Set();
+      renderQuiz();
+      updateScore();
+    }
+
+    function showAllAnswers() {
+      questions.forEach((q, qIndex) => {
+        if (!answeredQuestions.has(qIndex)) {
+          const feedback = document.getElementById(`feedback-${qIndex}`);
+          q.options.forEach((_, optIndex) => {
+            const btn = document.getElementById(`q${qIndex}-o${optIndex}`);
+            btn.disabled = true;
+            if (optIndex === q.answer) btn.classList.add('correct');
+          });
+          feedback.innerHTML = `<span class="warn">Correct answer shown.</span> ${q.explanation}`;
+          answeredQuestions.add(qIndex);
+          answeredCount++;
+        }
+      });
+      updateScore();
+    }
+
+    function startTimer(seconds) {
+      stopTimer();
+      let remaining = seconds;
+      const timerEl = document.getElementById('timer');
+      const timerMessageEl = document.getElementById('timerMessage');
+      timerMessageEl.textContent = 'Timer is running...';
+
+      timerInterval = setInterval(() => {
+        const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
+        const secs = String(remaining % 60).padStart(2, '0');
+        timerEl.textContent = `${mins}:${secs}`;
+
+        if (remaining <= 0) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          timerMessageEl.textContent = 'Time is up. Check your score and review missed items.';
+          return;
+        }
+        remaining--;
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      document.getElementById('timerMessage').textContent = 'Timer stopped.';
+    }
+
+    renderQuiz();
+    updateScore();
+  </script>
+</body>
+</html>
