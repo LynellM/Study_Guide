@@ -1,4 +1,4 @@
-# Dynamic Study Guide: AI Usage Levels
+# Dynamic Study Guide (Live Demo Found on my personal page at [lynellmines.](https://lynellmines.com/)
 
 A self-scoring study guide for a class slide deck on AI usage levels: L0 through L6, phase transitions, governance by level, and frontier concepts. It has 6 multiple-choice and 4 short-answer questions (24 points), a sticky live scoreboard, and a timed exam mode.
 
